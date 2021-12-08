@@ -1,13 +1,26 @@
-import http from 'http';
+import express from 'express';
 import { configuration } from './serverConfig';
+import apiRouter from './api'; //./api/index.js is implied because index.js is the file we are trying to access
 
-const server = http.createServer();
-server.listen(configuration.port);
-server.on('request', (req, res) => {
-  res.write('Hello HTTP!\n');
-  setTimeout(() => {
-    res.write('Done!!!!\n');
-    res.end();
-  }, 3000);
-  console.log('here');
+import fs from 'fs';
+const server = express();
+
+server.set('view engine', 'ejs');
+server.get('/', (req, res) => {
+  res.render('index', {
+    content: 'LUCAS',
+  });
+});
+
+server.use(express.static('public'));
+server.use('/api', apiRouter);
+server.get('/about.html', (req, res) => {
+  fs.readFile('./about.html', (err, data) => {
+    console.log('served!');
+    res.send(data.toString());
+  });
+});
+
+server.listen(configuration.port, () => {
+  console.info('listener started..');
 });
