@@ -1,6 +1,6 @@
-import ReactDOM from 'react-dom';
 import React from 'react';
-import Header from './header';
+import Header from './Header';
+import ContestPreview from './contestPreview';
 //class based components are stateful
 /* below is an example of a stateless component simple dom manipulation and return
 const App = () => {
@@ -30,6 +30,11 @@ class App extends React.Component {
     return (
       <div className="App">
         <Header headerMessage={this.state.pageHeader} />
+        <div>
+          {this.props.contests.map((contest) => (
+            <ContestPreview {...contest} key={contest.id} />
+          ))}
+        </div>
       </div>
     );
   }
