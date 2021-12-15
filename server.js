@@ -1,9 +1,17 @@
 import express from 'express';
 import { configuration } from './serverConfig';
 import apiRouter from './api'; //./api/index.js is implied because index.js is the file we are trying to access
-
+import nodeSassMiddleware from 'node-sass-middleware';
 import fs from 'fs';
+import path from 'path';
 const server = express();
+
+server.use(
+  nodeSassMiddleware({
+    src: path.join(__dirname, 'sass'),
+    dest: path.join(__dirname, 'public'),
+  })
+);
 
 server.set('view engine', 'ejs');
 server.get('/', (req, res) => {

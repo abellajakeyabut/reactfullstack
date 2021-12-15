@@ -1,9 +1,9 @@
 import React from 'react';
 
 const ContestPreview = (contest) => (
-  <div className="classPreview">
-    <div>{contest.categoryName}</div>
-    <div>{contest.contestName}</div>
+  <div className="ContestPreview">
+    <div className="category-name">{contest.categoryName}</div>
+    <div className="contest-name">{contest.contestName}</div>
   </div>
 );
 export default ContestPreview;

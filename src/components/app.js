@@ -1,6 +1,8 @@
 import React from 'react';
 import Header from './Header';
 import ContestPreview from './contestPreview';
+
+import axios from 'axios';
 //class based components are stateful
 /* below is an example of a stateless component simple dom manipulation and return
 const App = () => {
@@ -19,8 +21,15 @@ class App extends React.Component {
     super(props);
   }
   /** You can chose to define props like this without constructor */
-  state = { pageHeader: 'Naming Contest' };
+  state = { pageHeader: 'Naming Contest', contests: [] };
   componentDidMount() {
+    axios.get('http://localhost:8080/api/contests').then((resp) => {
+      console.log('api responded');
+      console.log('mapping data');
+      this.setState({ contests: resp.data.contests });
+      console.log('done');
+    });
+
     console.log('Component mounted');
   }
   componentWillUnmount() {
@@ -31,7 +40,7 @@ class App extends React.Component {
       <div className="App">
         <Header headerMessage={this.state.pageHeader} />
         <div>
-          {this.props.contests.map((contest) => (
+          {this.state.contests.map((contest) => (
             <ContestPreview {...contest} key={contest.id} />
           ))}
         </div>
