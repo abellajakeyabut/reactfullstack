@@ -21,14 +21,22 @@ class App extends React.Component {
     super(props);
   }
   /** You can chose to define props like this without constructor */
-  state = { pageHeader: 'Naming Contest', contests: [] };
+  state = {
+    pageHeader: 'Naming Contest',
+    contests: this.props.initialContests,
+  };
   componentDidMount() {
-    axios.get('http://localhost:8080/api/contests').then((resp) => {
-      console.log('api responded');
-      console.log('mapping data');
-      this.setState({ contests: resp.data.contests });
-      console.log('done');
-    });
+    console.log('refreshingxxx list');
+    axios
+      .get('http://localhost:8080/api/contests')
+      .then((resp) => {
+        console.log('api responded');
+        console.log('mapping data');
+
+        this.setState({ contests: resp.data.contests });
+        console.log('done');
+      })
+      .catch(console.error);
 
     console.log('Component mounted');
   }

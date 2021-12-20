@@ -2221,7 +2221,7 @@ var App = /*#__PURE__*/function (_React$Component) {
 
     _defineProperty(_assertThisInitialized(_this), "state", {
       pageHeader: 'Naming Contest',
-      contests: []
+      contests: _this.props.initialContests
     });
 
     return _this;
@@ -2234,6 +2234,7 @@ var App = /*#__PURE__*/function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
+      console.log('refreshingxxx list');
       axios__WEBPACK_IMPORTED_MODULE_3___default().get('http://localhost:8080/api/contests').then(function (resp) {
         console.log('api responded');
         console.log('mapping data');
@@ -2243,7 +2244,7 @@ var App = /*#__PURE__*/function (_React$Component) {
         });
 
         console.log('done');
-      });
+      })["catch"](console.error);
       console.log('Component mounted');
     }
   }, {
@@ -33212,7 +33213,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-react_dom__WEBPACK_IMPORTED_MODULE_0__.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1__.createElement(_components_App__WEBPACK_IMPORTED_MODULE_2__["default"], null), document.getElementById('root'));
+console.log('here');
+react_dom__WEBPACK_IMPORTED_MODULE_0__.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1__.createElement(_components_App__WEBPACK_IMPORTED_MODULE_2__["default"], {
+  initialContests: []
+}), document.getElementById('root'));
 })();
 
 /******/ })()

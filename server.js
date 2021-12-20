@@ -4,6 +4,7 @@ import apiRouter from './api'; //./api/index.js is implied because index.js is t
 import nodeSassMiddleware from 'node-sass-middleware';
 import fs from 'fs';
 import path from 'path';
+//import serverRender from './serverSide';
 const server = express();
 
 server.use(
@@ -19,7 +20,6 @@ server.get('/', (req, res) => {
     content: 'LUCAS',
   });
 });
-
 server.use(express.static('public'));
 server.use('/api', apiRouter);
 server.get('/about.html', (req, res) => {
@@ -32,3 +32,11 @@ server.get('/about.html', (req, res) => {
 server.listen(configuration.port, () => {
   console.info('listener started..');
 });
+
+/*server.get('/server-render', (req, res) => {
+  serverRender()
+    .then((content) => {
+      res.render('index', { content });
+    })
+    .catch(console.error);
+});*/

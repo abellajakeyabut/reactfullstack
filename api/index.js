@@ -9,6 +9,6 @@ router.get('/contests', (req, res) => {
   setTimeout(() => {
     console.log('returning list');
     res.send({ contests: data.contests });
-  }, 2000);
+  }, 1000);
 });
 export default router;

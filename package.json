@@ -7,6 +7,7 @@
     "run-babel": "babel-node --experimental-modules --es-module-specifier-resolution=node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon --exec babel-node server.js --ignore public/",
+    "start-server": "nodemon --exec babel-node serverSide.js --ignore public/",
     "dev": "webpack -w --mode=development"
   },
   "author": "Abella Jake Yabut",
