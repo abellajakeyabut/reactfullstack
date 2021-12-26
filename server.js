@@ -1,10 +1,11 @@
 import express from 'express';
 import { configuration } from './serverConfig';
-import apiRouter from './api'; //./api/index.js is implied because index.js is the file we are trying to access
+import apiRouter from './api';
+//./api/index.js is implied because index.js is the file we are trying to access
 import nodeSassMiddleware from 'node-sass-middleware';
 import fs from 'fs';
 import path from 'path';
-//import serverRender from './serverSide';
+import serverRender from './serverSide';
 const server = express();
 
 server.use(
@@ -14,13 +15,25 @@ server.use(
   })
 );
 
+server.use(express.static('public'));
 server.set('view engine', 'ejs');
-server.get('/', (req, res) => {
+/*server.get(['/'], (req, res) => {
   res.render('index', {
     content: 'LUCAS',
   });
+});*/
+server.get(['/', '/contest/:contestId'], (req, res) => {
+  serverRender(req.params.contestId)
+    .then(({ initialMarkup, initialData }) => {
+      console.log(initialMarkup);
+      res.render('index', { initialMarkup, initialData });
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status('400').send('Bad Request');
+    });
 });
-server.use(express.static('public'));
+
 server.use('/api', apiRouter);
 server.get('/about.html', (req, res) => {
   fs.readFile('./about.html', (err, data) => {
@@ -32,11 +45,3 @@ server.get('/about.html', (req, res) => {
 server.listen(configuration.port, () => {
   console.info('listener started..');
 });
-
-/*server.get('/server-render', (req, res) => {
-  serverRender()
-    .then((content) => {
-      res.render('index', { content });
-    })
-    .catch(console.error);
-});*/

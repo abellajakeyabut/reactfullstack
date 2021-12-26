@@ -26,7 +26,8 @@ class App extends React.Component {
   }
   /** You can chose to define props like this without constructor */
   state = {
-    contests: this.props.initialContests,
+    contests: this.props.initialData.contests,
+    currentContestId: this.props.initialData.currentContestId,
   };
   fetchContest = (contestId) => {
     pushState({ currentContestId: contestId }, `/contest/${contestId}`);
@@ -35,16 +36,16 @@ class App extends React.Component {
         currentContestId: resp.id,
         contests: { ...this.state.contests, [contestId]: resp },
       });
-      console.log('fetch api done');
-      console.log(resp.id);
-      console.log(this.state.pageHeader);
-      console.log(this.state.currentContestId);
     });
   };
   currentContest() {
+    console.log('here;');
+
+    console.log(this.state.contests[this.state.currentContestId]);
     return this.state.contests[this.state.currentContestId];
   }
   pageHeader() {
+    console.log(this.currentContest().contestName);
     if (this.state.currentContestId) {
       return this.currentContest().contestName;
     } else {
@@ -62,14 +63,12 @@ class App extends React.Component {
       />
     );
   }
-  componentDidMount() {
-    console.log('refreshingxxx list');
-    console.log('Component mounted');
-  }
-  componentWillUnmount() {
-    console.log('unmounted');
-  }
+
+  componentDidMount() {}
+  componentWillUnmount() {}
   render() {
+    console.log('calling render');
+    console.log(this.pageHeader());
     return (
       <div className="App">
         <Header headerMessage={this.pageHeader()} />
@@ -79,6 +78,7 @@ class App extends React.Component {
   }
 }
 App.propTypes = {
-  initialContests: propTypes.object,
+  initialData: propTypes.object,
+  currentContestId: propTypes.number,
 };
 export default App;

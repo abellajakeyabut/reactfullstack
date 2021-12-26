@@ -3,6 +3,7 @@ import propTypes from 'prop-types';
 
 const color = Math.random() > 0.5 ? 'green' : 'red';
 const Header = (props) => {
+  console.log(`header name is ${props.headerMessage}`);
   return (
     <h2 className="Header text-center" style={{ color }}>
       {props.headerMessage}

@@ -2155,13 +2155,19 @@ module.exports = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "fetchContest": () => (/* binding */ fetchContest)
+/* harmony export */   "fetchContest": () => (/* binding */ fetchContest),
+/* harmony export */   "fetchAllcontest": () => (/* binding */ fetchAllcontest)
 /* harmony export */ });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 
 var fetchContest = function fetchContest(contestId) {
   return axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/contest/".concat(contestId)).then(function (resp) {
+    return resp.data;
+  });
+};
+var fetchAllcontest = function fetchAllcontest() {
+  return axios__WEBPACK_IMPORTED_MODULE_0___default().get('/api/contests').then(function (resp) {
     return resp.data;
   });
 };
@@ -2252,7 +2258,8 @@ var App = /*#__PURE__*/function (_React$Component) {
     _this = _super.call(this, props);
 
     _defineProperty(_assertThisInitialized(_this), "state", {
-      contests: _this.props.initialContests
+      contests: _this.props.initialData.contests,
+      currentContestId: _this.props.initialData.currentContestId
     });
 
     _defineProperty(_assertThisInitialized(_this), "fetchContest", function (contestId) {
@@ -2264,11 +2271,6 @@ var App = /*#__PURE__*/function (_React$Component) {
           currentContestId: resp.id,
           contests: _objectSpread(_objectSpread({}, _this.state.contests), {}, _defineProperty({}, contestId, resp))
         });
-
-        console.log('fetch api done');
-        console.log(resp.id);
-        console.log(_this.state.pageHeader);
-        console.log(_this.state.currentContestId);
       });
     });
 
@@ -2280,11 +2282,15 @@ var App = /*#__PURE__*/function (_React$Component) {
   _createClass(App, [{
     key: "currentContest",
     value: function currentContest() {
+      console.log('here;');
+      console.log(this.state.contests[this.state.currentContestId]);
       return this.state.contests[this.state.currentContestId];
     }
   }, {
     key: "pageHeader",
     value: function pageHeader() {
+      console.log(this.currentContest().contestName);
+
       if (this.state.currentContestId) {
         return this.currentContest().contestName;
       } else {
@@ -2305,18 +2311,15 @@ var App = /*#__PURE__*/function (_React$Component) {
     }
   }, {
     key: "componentDidMount",
-    value: function componentDidMount() {
-      console.log('refreshingxxx list');
-      console.log('Component mounted');
-    }
+    value: function componentDidMount() {}
   }, {
     key: "componentWillUnmount",
-    value: function componentWillUnmount() {
-      console.log('unmounted');
-    }
+    value: function componentWillUnmount() {}
   }, {
     key: "render",
     value: function render() {
+      console.log('calling render');
+      console.log(this.pageHeader());
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
         className: "App"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Header__WEBPACK_IMPORTED_MODULE_1__["default"], {
@@ -2329,7 +2332,8 @@ var App = /*#__PURE__*/function (_React$Component) {
 }(react__WEBPACK_IMPORTED_MODULE_0__.Component);
 
 App.propTypes = {
-  initialContests: (prop_types__WEBPACK_IMPORTED_MODULE_2___default().object)
+  initialData: (prop_types__WEBPACK_IMPORTED_MODULE_2___default().object),
+  currentContestId: (prop_types__WEBPACK_IMPORTED_MODULE_2___default().number)
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (App);
 
@@ -2397,6 +2401,7 @@ var Contest = /*#__PURE__*/function (_React$Component) {
   _createClass(Contest, [{
     key: "render",
     value: function render() {
+      console.log("renderining from Contest component ".concat(this.props.categoryName));
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
         className: "Contest"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
@@ -2480,6 +2485,7 @@ __webpack_require__.r(__webpack_exports__);
 var color = Math.random() > 0.5 ? 'green' : 'red';
 
 var Header = function Header(props) {
+  console.log("header name is ".concat(props.headerMessage));
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h2", {
     className: "Header text-center",
     style: {
@@ -33467,9 +33473,8 @@ __webpack_require__.r(__webpack_exports__);
 
 axios__WEBPACK_IMPORTED_MODULE_2___default().get('http://localhost:8080/api/contests').then(function (resp) {
   react_dom__WEBPACK_IMPORTED_MODULE_0__.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1__.createElement(_components_App__WEBPACK_IMPORTED_MODULE_3__["default"], {
-    initialContests: resp.data.contests
+    initialData: resp.data.contests
   }), document.getElementById('root'));
-  console.log('done');
 })["catch"](console.error);
 })();
 

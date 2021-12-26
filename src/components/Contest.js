@@ -12,6 +12,9 @@ const Contest = ({ categoryName, contestName }) => (
 
 class Contest extends React.Component {
   render() {
+    console.log(
+      `renderining from Contest component ${this.props.categoryName}`
+    );
     return (
       <div className="Contest">
         <div className="category-name">{this.props.categoryName}</div>

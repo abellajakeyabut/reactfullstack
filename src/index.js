@@ -7,10 +7,8 @@ axios
   .get('http://localhost:8080/api/contests')
   .then((resp) => {
     ReactDOM.render(
-      <App initialContests={resp.data.contests} />,
+      <App initialData={resp.data.contests} />,
       document.getElementById('root')
     );
-
-    console.log('done');
   })
   .catch(console.error);
