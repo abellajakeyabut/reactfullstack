@@ -6,8 +6,10 @@ import App from './components/App';
 axios
   .get('http://localhost:8080/api/contests')
   .then((resp) => {
+    console.log('reacting here');
+    console.log(resp.data);
     ReactDOM.render(
-      <App initialData={resp.data.contests} />,
+      <App initialData={resp.data} />,
       document.getElementById('root')
     );
   })

@@ -5,5 +5,12 @@ export const fetchContest = (contestId) => {
 };
 
 export const fetchAllcontest = () => {
-  return axios.get('/api/contests').then((resp) => resp.data);
+  return axios.get('/api/contests').then((resp) => {
+    console.log('results');
+    console.log(resp.data);
+    return resp.data;
+  });
+};
+export const fetchNames = (nameIds) => {
+  return axios.get(`/api/names/${nameIds.join(',')}`).then((resp) => resp.data);
 };

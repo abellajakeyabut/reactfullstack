@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon --exec babel-node server.js --ignore public/",
     "start-server": "nodemon --exec babel-node serverSide.js --ignore public/",
-    "dev": "webpack -w --mode=development"
+    "dev": "webpack -w --mode=development",
+    "loadData": "babel-node --experimental-modules --es-module-specifier-resolution=node loadtestdata.js"
   },
   "author": "Abella Jake Yabut",
   "license": "ISC",
@@ -19,6 +20,7 @@
     "json-loader": "^0.5.7",
     "node-sass-middleware": "^0.11.0",
     "react": "^17.0.2",
+    "mongodb":"^2.2.10",
     "react-dom": "^17.0.2"
   },
   "devDependencies": {

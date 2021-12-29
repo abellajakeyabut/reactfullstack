@@ -18,7 +18,9 @@ export default App;
 */
 /* Below is a stateful component.  use only when using states */
 const pushState = (obj, url) => window.history.pushState(obj, '', url);
-
+const onPopState = (handler) => {
+  window.onpopstate = handler;
+};
 class App extends React.Component {
   /** you can define it in constructor as well */
   constructor(props) {
@@ -38,6 +40,38 @@ class App extends React.Component {
       });
     });
   };
+  fetchContestList = () => {
+    console.log('pushed back to list');
+    pushState({ currentContestId: null }, '/main');
+    api.fetchAllcontest().then((contestx) => {
+      console.log(contestx);
+      this.setState({
+        currentContestId: null,
+        contests: { ...contestx.contests },
+      });
+    });
+  };
+  fetchNames = (nameIds) => {
+    console.log(nameIds.length);
+    if (nameIds.length === 0) {
+      return;
+    }
+    api.fetchNames(nameIds).then((resp) => {
+      console.log('has names');
+      console.log(resp);
+      this.setState({ names: resp.names });
+    });
+  };
+  lookupName = (nameId) => {
+    console.log(this.state);
+    console.log(`sys - ${nameId}`);
+    if (!this.state.names || !this.state.names[nameId]) {
+      return {
+        name: '...',
+      };
+    }
+    return this.state.names[nameId];
+  };
   currentContest() {
     console.log('here;');
 
@@ -45,7 +79,8 @@ class App extends React.Component {
     return this.state.contests[this.state.currentContestId];
   }
   pageHeader() {
-    console.log(this.currentContest().contestName);
+    console.log('page header again');
+
     if (this.state.currentContestId) {
       return this.currentContest().contestName;
     } else {
@@ -53,9 +88,18 @@ class App extends React.Component {
     }
   }
   currentContent() {
+    console.log(`currentContent:${this.state.currentContestId}`);
     if (this.state.currentContestId) {
-      return <Contest {...this.currentContest()}></Contest>;
+      return (
+        <Contest
+          {...this.currentContest()}
+          fetchNames={this.fetchNames}
+          lookupName={this.lookupName}
+          contestListClick={this.fetchContestList}
+        ></Contest>
+      );
     }
+    console.log(this.state.contests);
     return (
       <ContestList
         contests={this.state.contests}
@@ -64,11 +108,16 @@ class App extends React.Component {
     );
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    onPopState((event) => {
+      this.setState({ currentContestId: (event.state || {}).currentContestId });
+    });
+  }
   componentWillUnmount() {}
   render() {
-    console.log('calling render');
+    console.log('render again');
     console.log(this.pageHeader());
+
     return (
       <div className="App">
         <Header headerMessage={this.pageHeader()} />

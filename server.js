@@ -17,12 +17,19 @@ server.use(
 
 server.use(express.static('public'));
 server.set('view engine', 'ejs');
-/*server.get(['/'], (req, res) => {
+server.get('/', (req, res) => {
+  console.log('main');
+  res.render('index', { initialMarkup: 'Express' });
+});
+server.get('/main', (req, res) => {
+  console.log('main page');
   res.render('index', {
-    content: 'LUCAS',
+    initialMarkup: 'LUCAS',
   });
-});*/
-server.get(['/', '/contest/:contestId'], (req, res) => {
+});
+
+server.get('/contest/:contestId', (req, res) => {
+  console.log('here');
   serverRender(req.params.contestId)
     .then(({ initialMarkup, initialData }) => {
       console.log(initialMarkup);
@@ -34,7 +41,6 @@ server.get(['/', '/contest/:contestId'], (req, res) => {
     });
 });
 
-server.use('/api', apiRouter);
 server.get('/about.html', (req, res) => {
   fs.readFile('./about.html', (err, data) => {
     console.log('served!');
@@ -42,6 +48,7 @@ server.get('/about.html', (req, res) => {
   });
 });
 
+server.use('/api', apiRouter);
 server.listen(configuration.port, () => {
   console.info('listener started..');
 });

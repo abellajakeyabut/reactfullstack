@@ -2156,7 +2156,8 @@ module.exports = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "fetchContest": () => (/* binding */ fetchContest),
-/* harmony export */   "fetchAllcontest": () => (/* binding */ fetchAllcontest)
+/* harmony export */   "fetchAllcontest": () => (/* binding */ fetchAllcontest),
+/* harmony export */   "fetchNames": () => (/* binding */ fetchNames)
 /* harmony export */ });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
@@ -2168,6 +2169,13 @@ var fetchContest = function fetchContest(contestId) {
 };
 var fetchAllcontest = function fetchAllcontest() {
   return axios__WEBPACK_IMPORTED_MODULE_0___default().get('/api/contests').then(function (resp) {
+    console.log('results');
+    console.log(resp.data);
+    return resp.data;
+  });
+};
+var fetchNames = function fetchNames(nameIds) {
+  return axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/names/".concat(nameIds.join(','))).then(function (resp) {
     return resp.data;
   });
 };
@@ -2193,6 +2201,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ContestList__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ContestList */ "./src/components/ContestList.js");
 /* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../api */ "./src/api.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
@@ -2244,6 +2254,10 @@ var pushState = function pushState(obj, url) {
   return window.history.pushState(obj, '', url);
 };
 
+var onPopState = function onPopState(handler) {
+  window.onpopstate = handler;
+};
+
 var App = /*#__PURE__*/function (_React$Component) {
   _inherits(App, _React$Component);
 
@@ -2274,6 +2288,52 @@ var App = /*#__PURE__*/function (_React$Component) {
       });
     });
 
+    _defineProperty(_assertThisInitialized(_this), "fetchContestList", function () {
+      console.log('pushed back to list');
+      pushState({
+        currentContestId: null
+      }, '/main');
+      _api__WEBPACK_IMPORTED_MODULE_5__.fetchAllcontest().then(function (contestx) {
+        console.log(contestx);
+
+        _this.setState({
+          currentContestId: null,
+          contests: _objectSpread({}, contestx.contests)
+        });
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "fetchNames", function (nameIds) {
+      console.log(nameIds.length);
+
+      if (nameIds.length === 0) {
+        return;
+      }
+
+      _api__WEBPACK_IMPORTED_MODULE_5__.fetchNames(nameIds).then(function (resp) {
+        console.log('has names');
+        console.log(resp);
+
+        _this.setState({
+          names: resp.names
+        });
+      });
+      console.log(_this.state.names);
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "lookupName", function (nameId) {
+      console.log(_this.state);
+      console.log("sys - ".concat(nameId));
+
+      if (!_this.state.names || !_this.state.names[nameId]) {
+        return {
+          name: '...'
+        };
+      }
+
+      return _this.state.names[nameId];
+    });
+
     return _this;
   }
   /** You can chose to define props like this without constructor */
@@ -2289,7 +2349,7 @@ var App = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "pageHeader",
     value: function pageHeader() {
-      console.log(this.currentContest().contestName);
+      console.log('page header again');
 
       if (this.state.currentContestId) {
         return this.currentContest().contestName;
@@ -2300,10 +2360,17 @@ var App = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "currentContent",
     value: function currentContent() {
+      console.log("currentContent:".concat(this.state.currentContestId));
+
       if (this.state.currentContestId) {
-        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Contest__WEBPACK_IMPORTED_MODULE_3__["default"], this.currentContest());
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Contest__WEBPACK_IMPORTED_MODULE_3__["default"], _extends({}, this.currentContest(), {
+          fetchNames: this.fetchNames,
+          lookupName: this.lookupName,
+          contestListClick: this.fetchContestList
+        }));
       }
 
+      console.log(this.state.contests);
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_ContestList__WEBPACK_IMPORTED_MODULE_4__["default"], {
         contests: this.state.contests,
         onContestClick: this.fetchContest
@@ -2311,14 +2378,22 @@ var App = /*#__PURE__*/function (_React$Component) {
     }
   }, {
     key: "componentDidMount",
-    value: function componentDidMount() {}
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      onPopState(function (event) {
+        _this2.setState({
+          currentContestId: (event.state || {}).currentContestId
+        });
+      });
+    }
   }, {
     key: "componentWillUnmount",
     value: function componentWillUnmount() {}
   }, {
     key: "render",
     value: function render() {
-      console.log('calling render');
+      console.log('render again');
       console.log(this.pageHeader());
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
         className: "App"
@@ -2399,16 +2474,69 @@ var Contest = /*#__PURE__*/function (_React$Component) {
   }
 
   _createClass(Contest, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      console.log(this.props.nameIds);
+      this.props.fetchNames(this.props.nameIds);
+    }
+  }, {
     key: "render",
     value: function render() {
-      console.log("renderining from Contest component ".concat(this.props.categoryName));
+      var _this = this;
+
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
         className: "Contest"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
-        className: "category-name"
-      }, this.props.categoryName), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
-        className: "contest-name"
-      }, " ", this.props.contestName));
+        className: "panel panel-default"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        className: "panel-heading"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h3", {
+        className: "panel-title"
+      }, "Contest Description")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        className: "panel-body"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        className: "contest-description"
+      }, this.props.description))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        className: "panel panel-default"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        className: "panel-heading"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h3", {
+        className: "panel-title"
+      }, "Proposed Names")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        className: "panel-body"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("ul", {
+        className: "list-group"
+      }, this.props.nameIds.map(function (nameId) {
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("li", {
+          key: nameId,
+          className: "list-group-item"
+        }, _this.props.lookupName(nameId).name);
+      })))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        className: "panel panel-info"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        className: "panel-heading"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h3", {
+        className: "panel-title"
+      }, "Propose a New Name")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        className: "panel-body"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("form", {
+        onSubmit: this.handleSubmit
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        className: "input-group"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", {
+        type: "text",
+        placeholder: "New Name Here...",
+        ref: "newNameInput",
+        className: "form-control"
+      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", {
+        className: "input-group-btn"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", {
+        type: "submit",
+        className: "btn btn-info"
+      }, "Sumbit")))))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        className: "home-link link",
+        onClick: this.props.contestListClick
+      }, "Contest List"));
     }
   }]);
 
@@ -2418,7 +2546,11 @@ var Contest = /*#__PURE__*/function (_React$Component) {
 Contest.propTypes = {
   id: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().number),
   categoryName: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string.isRequired),
-  contestName: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string.isRequired)
+  contestName: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string.isRequired),
+  contestListClick: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().func.isRequired),
+  lookupName: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().func.isRequired),
+  fetchNames: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().func.isRequired),
+  nameIds: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().array)
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Contest);
 
@@ -33472,8 +33604,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 axios__WEBPACK_IMPORTED_MODULE_2___default().get('http://localhost:8080/api/contests').then(function (resp) {
+  console.log('reacting here');
+  console.log(resp.data);
   react_dom__WEBPACK_IMPORTED_MODULE_0__.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1__.createElement(_components_App__WEBPACK_IMPORTED_MODULE_3__["default"], {
-    initialData: resp.data.contests
+    initialData: resp.data
   }), document.getElementById('root'));
 })["catch"](console.error);
 })();
