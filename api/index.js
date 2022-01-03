@@ -1,11 +1,17 @@
 import express from 'express';
-const router = express.Router();
+
 import data from '../src/testdata.json';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import assert from 'assert';
 import { configuration } from '../serverConfig';
-
+import bodyParser from 'body-parser';
+import { Server } from 'http';
 let mdb;
+const app = express();
+const router = express.Router();
+router.use(bodyParser.urlencoded({ extended: false }));
+router.use(bodyParser.json());
+
 MongoClient.connect(configuration.mongodUri, (err, db) => {
   assert.equal(null, err);
   mdb = db;
@@ -26,7 +32,7 @@ router.get('/contests', (req, res) => {
       categoryName: 1,
       contestName: 1,
       description: 1,
-      nameIds:1
+      nameIds: 1,
     })
     .each((err, contest) => {
       if (!contest) {
@@ -52,12 +58,16 @@ router.get('/contest/:contestId', (req, res) => {
     .then((contest) => res.send(contest))
     .catch((error) => console.log(error));
 });
+router.post('/names', (req, res) => {
+  console.log(req);
+  res.send(req.body.name);
+});
 router.get('/names/:nameIds', (req, res) => {
-  const nameIds = req.params.nameIds.split(',').map(Number);
+  const nameIds = req.params.nameIds.split(',').map(ObjectId);
   let names = {};
   mdb
     .collection('names')
-    .find({ id: { $in: nameIds } })
+    .find({ _id: { $in: nameIds } })
     .each((err, name) => {
       assert.equal(null, err);
       if (!name) {
@@ -65,8 +75,9 @@ router.get('/names/:nameIds', (req, res) => {
         return;
       }
       if (name) {
-        names[name.id] = name;
+        names[name._id] = name;
       }
     });
 });
+
 export default router;

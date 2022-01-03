@@ -2318,7 +2318,6 @@ var App = /*#__PURE__*/function (_React$Component) {
           names: resp.names
         });
       });
-      console.log(_this.state.names);
     });
 
     _defineProperty(_assertThisInitialized(_this), "lookupName", function (nameId) {

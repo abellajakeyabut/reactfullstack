@@ -9,18 +9,20 @@
     "start": "nodemon --exec babel-node server.js --ignore public/",
     "start-server": "nodemon --exec babel-node serverSide.js --ignore public/",
     "dev": "webpack -w --mode=development",
-    "loadData": "babel-node --experimental-modules --es-module-specifier-resolution=node loadtestdata.js"
+    "loadData": "babel-node --experimental-modules --es-module-specifier-resolution=node loadtestdata.js",
+    "updateTestData": "babel-node --experimental-modules --es-module-specifier-resolution=node updateTestData.js"
   },
   "author": "Abella Jake Yabut",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.24.0",
+    "body-parser": "^1.19.0",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "json-loader": "^0.5.7",
+    "mongodb": "^2.2.10",
     "node-sass-middleware": "^0.11.0",
     "react": "^17.0.2",
-    "mongodb":"^2.2.10",
     "react-dom": "^17.0.2"
   },
   "devDependencies": {
