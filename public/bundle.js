@@ -2157,7 +2157,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "fetchContest": () => (/* binding */ fetchContest),
 /* harmony export */   "fetchAllcontest": () => (/* binding */ fetchAllcontest),
-/* harmony export */   "fetchNames": () => (/* binding */ fetchNames)
+/* harmony export */   "fetchNames": () => (/* binding */ fetchNames),
+/* harmony export */   "addName": () => (/* binding */ addName)
 /* harmony export */ });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
@@ -2176,6 +2177,16 @@ var fetchAllcontest = function fetchAllcontest() {
 };
 var fetchNames = function fetchNames(nameIds) {
   return axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/names/".concat(nameIds.join(','))).then(function (resp) {
+    return resp.data;
+  });
+};
+var addName = function addName(newName, contestId) {
+  console.log(newName);
+  console.log(contestId);
+  return axios__WEBPACK_IMPORTED_MODULE_0___default().post('/api/names/', {
+    newName: newName,
+    contestId: contestId
+  }).then(function (resp) {
     return resp.data;
   });
 };
@@ -2282,20 +2293,31 @@ var App = /*#__PURE__*/function (_React$Component) {
       }, "/contest/".concat(contestId));
       _api__WEBPACK_IMPORTED_MODULE_5__.fetchContest(contestId).then(function (resp) {
         _this.setState({
-          currentContestId: resp.id,
-          contests: _objectSpread(_objectSpread({}, _this.state.contests), {}, _defineProperty({}, contestId, resp))
+          currentContestId: resp._id,
+          contests: _objectSpread(_objectSpread({}, _this.state.contests), {}, _defineProperty({}, resp._id, resp))
+        });
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "addName", function (newName, contestId) {
+      _api__WEBPACK_IMPORTED_MODULE_5__.addName(newName, contestId).then(function (resp) {
+        _this.setState({
+          contests: _objectSpread(_objectSpread({}, _this.state.contests), {}, _defineProperty({}, resp.updatedContest._id, resp.updatedContest)),
+          currentContestId: resp.updatedContest._id,
+          names: _objectSpread(_objectSpread({}, _this.state.names), {}, _defineProperty({}, resp.newName._id, resp.newName))
+        }, function () {
+          console.log('state updated');
+
+          _this.forceUpdate();
         });
       });
     });
 
     _defineProperty(_assertThisInitialized(_this), "fetchContestList", function () {
-      console.log('pushed back to list');
       pushState({
         currentContestId: null
       }, '/main');
       _api__WEBPACK_IMPORTED_MODULE_5__.fetchAllcontest().then(function (contestx) {
-        console.log(contestx);
-
         _this.setState({
           currentContestId: null,
           contests: _objectSpread({}, contestx.contests)
@@ -2304,7 +2326,7 @@ var App = /*#__PURE__*/function (_React$Component) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "fetchNames", function (nameIds) {
-      console.log(nameIds.length);
+      console.log("name ids are : ".concat(nameIds));
 
       if (nameIds.length === 0) {
         return;
@@ -2321,8 +2343,10 @@ var App = /*#__PURE__*/function (_React$Component) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "lookupName", function (nameId) {
-      console.log(_this.state);
-      console.log("sys - ".concat(nameId));
+      if (_this.state.names) {
+        console.log(_this.state.names[nameId]);
+        console.log("nameID is:".concat(nameId));
+      }
 
       if (!_this.state.names || !_this.state.names[nameId]) {
         return {
@@ -2341,15 +2365,12 @@ var App = /*#__PURE__*/function (_React$Component) {
   _createClass(App, [{
     key: "currentContest",
     value: function currentContest() {
-      console.log('here;');
       console.log(this.state.contests[this.state.currentContestId]);
       return this.state.contests[this.state.currentContestId];
     }
   }, {
     key: "pageHeader",
     value: function pageHeader() {
-      console.log('page header again');
-
       if (this.state.currentContestId) {
         return this.currentContest().contestName;
       } else {
@@ -2359,17 +2380,15 @@ var App = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "currentContent",
     value: function currentContent() {
-      console.log("currentContent:".concat(this.state.currentContestId));
-
       if (this.state.currentContestId) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Contest__WEBPACK_IMPORTED_MODULE_3__["default"], _extends({}, this.currentContest(), {
           fetchNames: this.fetchNames,
           lookupName: this.lookupName,
-          contestListClick: this.fetchContestList
+          contestListClick: this.fetchContestList,
+          addName: this.addName
         }));
       }
 
-      console.log(this.state.contests);
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_ContestList__WEBPACK_IMPORTED_MODULE_4__["default"], {
         contests: this.state.contests,
         onContestClick: this.fetchContest
@@ -2449,6 +2468,8 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 /* non-component approach
@@ -2467,21 +2488,36 @@ var Contest = /*#__PURE__*/function (_React$Component) {
   var _super = _createSuper(Contest);
 
   function Contest() {
+    var _this;
+
     _classCallCheck(this, Contest);
 
-    return _super.apply(this, arguments);
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    _this = _super.call.apply(_super, [this].concat(args));
+
+    _defineProperty(_assertThisInitialized(_this), "handleSubmit", function (event) {
+      event.preventDefault();
+
+      _this.props.addName(_this.nameInput.value, _this.props._id);
+
+      _this.nameInput.value = '';
+    });
+
+    return _this;
   }
 
   _createClass(Contest, [{
     key: "componentDidMount",
     value: function componentDidMount() {
-      console.log(this.props.nameIds);
       this.props.fetchNames(this.props.nameIds);
     }
   }, {
     key: "render",
     value: function render() {
-      var _this = this;
+      var _this2 = this;
 
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
         className: "Contest"
@@ -2509,7 +2545,7 @@ var Contest = /*#__PURE__*/function (_React$Component) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("li", {
           key: nameId,
           className: "list-group-item"
-        }, _this.props.lookupName(nameId).name);
+        }, _this2.props.lookupName(nameId).name);
       })))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
         className: "panel panel-info"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
@@ -2525,7 +2561,9 @@ var Contest = /*#__PURE__*/function (_React$Component) {
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", {
         type: "text",
         placeholder: "New Name Here...",
-        ref: "newNameInput",
+        ref: function ref(_ref) {
+          return _this2.nameInput = _ref;
+        },
         className: "form-control"
       }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", {
         className: "input-group-btn"
@@ -2543,13 +2581,15 @@ var Contest = /*#__PURE__*/function (_React$Component) {
 }(react__WEBPACK_IMPORTED_MODULE_0__.Component);
 
 Contest.propTypes = {
+  _id: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string.isRequired),
   id: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().number),
   categoryName: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string.isRequired),
   contestName: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().string.isRequired),
   contestListClick: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().func.isRequired),
   lookupName: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().func.isRequired),
   fetchNames: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().func.isRequired),
-  nameIds: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().array)
+  nameIds: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().array),
+  addName: (prop_types__WEBPACK_IMPORTED_MODULE_1___default().func.isRequired)
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Contest);
 

@@ -14,3 +14,11 @@ export const fetchAllcontest = () => {
 export const fetchNames = (nameIds) => {
   return axios.get(`/api/names/${nameIds.join(',')}`).then((resp) => resp.data);
 };
+
+export const addName = (newName, contestId) => {
+  console.log(newName);
+  console.log(contestId);
+  return axios
+    .post('/api/names/', { newName, contestId })
+    .then((resp) => resp.data);
+};

@@ -59,8 +59,15 @@ router.get('/contest/:contestId', (req, res) => {
     .catch((error) => console.log(error));
 });
 router.post('/names', (req, res) => {
+  const contestId = ObjectId(req.body.contestId);
+  const name = req.body.newName;
+  mdb.collection('names').insertOne({name}).then(result=>
+    mdb.collection('contests').findAndModify(
+      {_id:contestId},[],{$push:{nameIds:result.insertedId}},
+      {new:true})
+      .then(doc=>res.send({updatedContest:doc.value,newName:{_id:result.insertedId,name}})));
   console.log(req);
-  res.send(req.body.name);
+ 
 });
 router.get('/names/:nameIds', (req, res) => {
   const nameIds = req.params.nameIds.split(',').map(ObjectId);
